@@ -1,4 +1,4 @@
-import firebase from 'firebase/app';
+import firebase, { firestore } from 'firebase/app';
 import 'firebase/firestore';
 import 'firebase/auth';
 
@@ -12,10 +12,39 @@ const firebaseConfig = {
   appId: "1:447614497996:web:89591d12f17b193b46fe69"
 };
 
+export const createUserProfileDocument = async (userAuth, additionalData) => {
+  //If User not connected we do nothing
+  if (!userAuth){
+    return;
+  }
+  //If User is connected we'll check if the user already exist in db if not we gonna add him
+  //userRef contains the informations of our doc for this id !!not the data!! 
+  const userRef = db.doc(`users/${userAuth.uid}`);
+  //snapshot contains all the data for the current doc => await cause get is a promise
+  const snapshot = await userRef.get();
+
+  //Check if the user with this id already exist in our db
+  if(!snapshot.exists){
+    const docData = {
+      displayName: userAuth.displayName,
+      email: userAuth.email,
+      created_at: firebase.firestore.Timestamp.now(),
+      ...additionalData
+    };  
+    try {
+      await userRef.set(docData)
+    } catch (error) {
+      console.log('error creating user',error.message);
+    }
+  }
+  
+  return userRef;
+}
+
 firebase.initializeApp(firebaseConfig);
  
 export const auth = firebase.auth();
-export const db = firebase.firestore();
+export const db = firestore();
 
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ prompt: 'select_account'});

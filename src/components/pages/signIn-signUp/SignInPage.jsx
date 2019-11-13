@@ -2,8 +2,8 @@ import React from 'react';
 
 import './signinpage.scss';
 
-import SignIn from './../../signIn/SignIn';
-import SignUp from './../../signup/SignUp';
+import SignIn from '../../signIn/SignIn';
+import SignUp from '../../signup/SignUp';
 
 const SignInPage = ()=>{
   return (
